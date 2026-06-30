@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIBrow - AI Photo Editor</title>
+  <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+  <header>
+    <h1>AIBrow</h1>
+    <p>AI-assisted photo editor powered by FFmpeg and LLMs</p>
+  </header>
+  <main>
+    <section id="upload-section">
+      <label for="image-input" class="drop-zone">
+        Drop an image here or click to upload
+        <input id="image-input" type="file" accept="image/*" hidden>
+      </label>
+    </section>
+    <section id="compare-section" class="hidden">
+      <div class="image-pane">
+        <h2>Original</h2>
+        <img id="original-img" alt="original">
+      </div>
+      <div class="image-pane">
+        <h2>AI Edit</h2>
+        <img id="edited-img" alt="edited">
+        <button id="settings-btn" title="Edit parameters">⚙️</button>
+      </div>
+    </section>
+    <div id="action-buttons" class="hidden"></div>
+    <section id="params-section" class="hidden">
+      <h3>Adjustment Parameters</h3>
+      <form id="params-form"></form>
+      <button id="apply-btn">Apply</button>
+    </section>
+  </main>
+  <footer>
+    <a href="/swagger/index.html" target="_blank">API Docs</a>
+  </footer>
+  <script src="/web/app.js"></script>
+</body>
+</html>

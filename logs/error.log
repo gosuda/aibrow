@@ -1,0 +1,5 @@
+[aibrow] 2026/06/30 17:58:34.033149 go version: 
+[aibrow] 2026/06/30 17:58:34.033191 rest port requested: 8080
+[aibrow] 2026/06/30 17:58:34.033198 swagger port requested: 8081
+[aibrow] 2026/06/30 17:58:34.033469 rest server listening on :8080
+[aibrow] 2026/06/30 17:58:34.033474 swagger server listening on :8081

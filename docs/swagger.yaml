@@ -1,0 +1,495 @@
+definitions:
+  ffmpeg.AdjustParams:
+    properties:
+      black_level:
+        type: number
+      brightness:
+        type: number
+      contrast:
+        type: number
+      gamma:
+        type: number
+      gamma_b:
+        type: number
+      gamma_g:
+        type: number
+      gamma_r:
+        type: number
+      highlight_b:
+        type: number
+      highlight_g:
+        type: number
+      highlight_r:
+        type: number
+      micro_contrast:
+        type: number
+      saturation:
+        type: number
+      shadow_b:
+        type: number
+      shadow_g:
+        type: number
+      shadow_r:
+        type: number
+      temperature:
+        type: number
+      white_level:
+        type: number
+    type: object
+  ffmpeg.Analysis:
+    properties:
+      avg_b:
+        type: number
+      avg_g:
+        type: number
+      avg_r:
+        type: number
+      black_level:
+        type: number
+      c_mean:
+        type: number
+      c_std:
+        type: number
+      h_mean:
+        type: number
+      height:
+        type: integer
+      highlight_gain:
+        type: number
+      l_mean:
+        type: number
+      l_std:
+        type: number
+      micro_contrast:
+        type: number
+      shadow_lift:
+        type: number
+      white_level:
+        type: number
+      width:
+        type: integer
+    type: object
+  llm.Message:
+    properties:
+      content:
+        type: string
+      role:
+        $ref: '#/definitions/llm.Role'
+    type: object
+  llm.Role:
+    enum:
+    - system
+    - user
+    - assistant
+    type: string
+    x-enum-varnames:
+    - RoleSystem
+    - RoleUser
+    - RoleAssistant
+  server.chatRequest:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/llm.Message'
+        type: array
+    required:
+    - messages
+    type: object
+  server.chatResponseSwagger:
+    properties:
+      message:
+        type: string
+      results:
+        items:
+          $ref: '#/definitions/server.chatResponseToolResult'
+        type: array
+      tool_calls:
+        items:
+          $ref: '#/definitions/server.chatResponseToolCall'
+        type: array
+    type: object
+  server.chatResponseToolCall:
+    properties:
+      arguments:
+        type: string
+      name:
+        type: string
+    type: object
+  server.chatResponseToolResult:
+    properties:
+      error:
+        type: string
+      input:
+        type: string
+      name:
+        type: string
+      output: {}
+    type: object
+  server.healthResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  server.requestResponseSwagger:
+    properties:
+      image_id:
+        type: string
+      message:
+        type: string
+      results:
+        items:
+          $ref: '#/definitions/server.chatResponseToolResult'
+        type: array
+      tool_calls:
+        items:
+          $ref: '#/definitions/server.chatResponseToolCall'
+        type: array
+    type: object
+  server.uploadResponse:
+    properties:
+      id:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: AI photo editor API with FFmpeg, LCH analysis, and LLM chat.
+  title: AIBrow API
+  version: 1.0.0
+paths:
+  /api/v1/chat:
+    post:
+      consumes:
+      - application/json
+      description: Sends a conversation to the configured LLM and executes any requested
+        tools.
+      parameters:
+      - description: chat messages
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/server.chatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.chatResponseSwagger'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Chat with the AI photo editor
+      tags:
+      - chat
+  /api/v1/images/{id}:
+    get:
+      description: Serves the original image by ID.
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an image
+      tags:
+      - images
+  /api/v1/images/{id}/adjust:
+    post:
+      consumes:
+      - application/json
+      description: Applies adjustment parameters to produce the AI edit.
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: adjustment params
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/ffmpeg.AdjustParams'
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Adjust an image
+      tags:
+      - images
+  /api/v1/images/{id}/analyze:
+    post:
+      description: Runs LCH analysis on the uploaded image.
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ffmpeg.Analysis'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Analyze an image
+      tags:
+      - images
+  /api/v1/images/{id}/convert:
+    post:
+      description: Saves the processed image in a different format.
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: target format
+        in: query
+        name: format
+        required: true
+        type: string
+      - description: quality
+        in: query
+        name: quality
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Convert image format
+      tags:
+      - images
+  /api/v1/images/{id}/export:
+    post:
+      description: Exports the analysis and adjustment parameters for an image as
+        an .xlsx file.
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Export image preset to Excel
+      tags:
+      - images
+  /api/v1/images/{id}/processed:
+    get:
+      description: Serves the edited/processed image by ID if one exists.
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get processed image
+      tags:
+      - images
+  /api/v1/images/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads an image file for editing.
+      parameters:
+      - description: image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.uploadResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Upload an image
+      tags:
+      - images
+  /api/v1/request:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads an image and lets the configured LLM orchestrate analysis,
+        adjustment, conversion, and export tools.
+      parameters:
+      - description: image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: natural language instruction
+        in: formData
+        name: prompt
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.requestResponseSwagger'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Natural language photo edit request
+      tags:
+      - request
+  /health:
+    get:
+      description: Returns the current service health status.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.healthResponse'
+      summary: Health check
+      tags:
+      - system
+swagger: "2.0"

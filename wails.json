@@ -1,0 +1,20 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "aibrow",
+  "outputfilename": "aibrow",
+  "frontend:dir": "web",
+  "frontend:install": "echo 'no frontend install step'",
+  "frontend:build": "echo 'no frontend build step'",
+  "frontend:dev:watcher": "echo 'no dev watcher'",
+  "frontend:dev:serverUrl": "",
+  "author": {
+    "name": "yjlee",
+    "email": "yjlee@example.com"
+  },
+  "info": {
+    "productName": "AIBrow",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026 yjlee",
+    "comments": "AI-assisted photo editor"
+  }
+}
