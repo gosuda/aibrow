@@ -6,6 +6,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Build ${{ matrix.build-name }}
@@ -14,19 +18,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: depot-ubuntu-22.04
             platform: linux/amd64
             build-name: aibrow-linux-amd64
             package: binary
-          - os: windows-latest
+          - os: depot-windows-2025-4
             platform: windows/amd64
             build-name: aibrow-windows-amd64
             package: binary
-          - os: macos-latest
+          - os: depot-macos-latest
             platform: darwin/amd64
             build-name: aibrow-macos-amd64
             package: app
-          - os: macos-latest
+          - os: depot-macos-latest
             platform: darwin/arm64
             build-name: aibrow-macos-arm64
             package: app
@@ -47,7 +51,7 @@ jobs:
         uses: FedericoCarboni/setup-ffmpeg@v3
 
       - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'depot-ubuntu-22.04'
         run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev
 
       - name: Generate app icon
