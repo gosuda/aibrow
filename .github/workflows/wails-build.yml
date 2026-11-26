@@ -22,11 +22,11 @@ jobs:
             platform: windows/amd64
             build-name: aibrow-windows-amd64
             package: binary
-          - os: macos-latest
+          - os: depot-macos-latest
             platform: darwin/amd64
             build-name: aibrow-macos-amd64
             package: app
-          - os: macos-latest
+          - os: depot-macos-latest
             platform: darwin/arm64
             build-name: aibrow-macos-arm64
             package: app
